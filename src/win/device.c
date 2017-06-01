@@ -259,7 +259,10 @@ void uv_process_device_read_req(uv_loop_t* loop,
       handle->read_cb((uv_stream_t*) handle,
                       req->u.io.overlapped.InternalHigh,
                       &handle->read_buffer);
-    } else {
+    } else if (req->u.io.overlapped.Internal == STATUS_WAIT_0){
+      /* Timeout */
+      handle->read_cb((uv_stream_t*) handle, STATUS_WAIT_0, &handle->read_buffer);
+    }  else {
       /* Connection closed */
       handle->flags &= ~UV_HANDLE_READING;
       DECREASE_ACTIVE_COUNT(loop, handle);
